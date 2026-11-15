@@ -3,15 +3,15 @@
 <img src="static/images/banner.png" alt="NoVice banner" width="440">
 
 <a href="https://github.com/kpulka247/novice/actions" title="GitHub Actions Workflow Status"><img src="https://img.shields.io/github/actions/workflow/status/kpulka247/novice/release.yml"></a>
-<a title="Chrome Web Store Size"><img src="https://img.shields.io/chrome-web-store/size/caledcpfdapmmhmflbpjmjnenmjggghp"></a>
-<a href="https://github.com/kpulka247/novice/releases" title="GitHub Release"><img src="https://img.shields.io/github/v/release/kpulka247/novice?logo=github&logoColor=white"></a>
-<a href="https://github.com/kpulka247/novice/blob/main/LICENSE" title="GitHub License"><img src="https://img.shields.io/github/license/kpulka247/novice?color=%230d0b14"></a>
+<a title="Chrome Web Store Size"><img src="https://img.shields.io/chrome-web-store/size/caledcpfdapmmhmflbpjmjnenmjggghp?color=blue"></a>
+<a href="https://github.com/kpulka247/novice/releases" title="GitHub Release"><img src="https://img.shields.io/github/v/release/kpulka247/novice?logo=github&logoColor=white&color=%236f42c1"></a>
+<a href="https://github.com/kpulka247/novice/blob/main/LICENSE" title="GitHub License"><img src="https://img.shields.io/github/license/kpulka247/novice?color=%23252525"></a>
 
-<a href="https://chromewebstore.google.com/detail/novice-block-gta-6-spoile/caledcpfdapmmhmflbpjmjnenmjggghp" title="Chrome Web Store Users"><img src="https://img.shields.io/chrome-web-store/users/caledcpfdapmmhmflbpjmjnenmjggghp?logo=Google%20Chrome&logoColor=white&color=%23ff3d9a"></a>
-<a href="https://chromewebstore.google.com/detail/novice-block-gta-6-spoile/caledcpfdapmmhmflbpjmjnenmjggghp" title="Chrome Web Store Rating"><img src="https://img.shields.io/chrome-web-store/rating/caledcpfdapmmhmflbpjmjnenmjggghp"></a>
+<a href="https://chromewebstore.google.com/detail/novice-block-gta-6-spoile/caledcpfdapmmhmflbpjmjnenmjggghp" title="Chrome Web Store Users"><img src="https://img.shields.io/chrome-web-store/users/caledcpfdapmmhmflbpjmjnenmjggghp?logo=Google%20Chrome&logoColor=white&color=blue"></a>
+<a href="https://chromewebstore.google.com/detail/novice-block-gta-6-spoile/caledcpfdapmmhmflbpjmjnenmjggghp" title="Chrome Web Store Rating"><img src="https://img.shields.io/chrome-web-store/rating/caledcpfdapmmhmflbpjmjnenmjggghp?color=blue"></a>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<a href="https://addons.mozilla.org/firefox/addon/novice/" title="Mozilla Add-on Users"><img src="https://img.shields.io/amo/users/novice?logo=Firefox&logoColor=white&color=%23ff3d9a"></a>
-<a href="https://addons.mozilla.org/firefox/addon/novice/" title="Mozilla Add-on Rating"><img src="https://img.shields.io/amo/rating/novice"></a>
+<a href="https://addons.mozilla.org/firefox/addon/novice/" title="Mozilla Add-on Users"><img src="https://img.shields.io/amo/users/novice?logo=Firefox&logoColor=white&color=red"></a>
+<a href="https://addons.mozilla.org/firefox/addon/novice/" title="Mozilla Add-on Rating"><img src="https://img.shields.io/amo/rating/novice?color=red"></a>
 
 </div>
 
@@ -50,8 +50,8 @@ Play GTA VI knowing nothing about it. NoVice blurs every trailer, leak, post, an
 
 <div align="center">
 
-<a href="https://chromewebstore.google.com/detail/novice-block-gta-6-spoile/caledcpfdapmmhmflbpjmjnenmjggghp" title="Chrome Web Store Version"><img src="https://img.shields.io/chrome-web-store/v/caledcpfdapmmhmflbpjmjnenmjggghp?style=for-the-badge&logo=google%20chrome&logoColor=white&labelColor=%230d0b14&color=%23ff3d9a"></a>
-<a href="https://addons.mozilla.org/firefox/addon/novice/" title="Mozilla Add-on Version"><img src="https://img.shields.io/amo/v/novice?style=for-the-badge&logo=firefox&logoColor=white&labelColor=%230d0b14&color=%23ffa24c"></a>
+<a href="https://chromewebstore.google.com/detail/novice-block-gta-6-spoile/caledcpfdapmmhmflbpjmjnenmjggghp" title="Chrome Web Store Version"><img src="https://img.shields.io/chrome-web-store/v/caledcpfdapmmhmflbpjmjnenmjggghp?style=for-the-badge&logo=google%20chrome&logoColor=white&labelColor=%23252525&color=blue"></a>
+<a href="https://addons.mozilla.org/firefox/addon/novice/" title="Mozilla Add-on Version"><img src="https://img.shields.io/amo/v/novice?style=for-the-badge&logo=firefox&logoColor=white&labelColor=%23252525&color=red"></a>
 
 </div>
 
