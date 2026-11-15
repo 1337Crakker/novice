@@ -1,3 +1,13 @@
+## [1.2.0](https://github.com/kpulka247/novice/compare/v1.1.0...v1.2.0) (2026-11-15)
+
+### Features
+
+* **popup:** add a coffee footer and fit the popup without scrolling ([e4e1cba](https://github.com/kpulka247/novice/commit/e4e1cba8269bf0185afa27df563221078fe74dc1))
+
+### Bug Fixes
+
+* match the keyword input and add button to the spoiler toggle ([91d2ef8](https://github.com/kpulka247/novice/commit/91d2ef81b27e4e7d93bc8675e9db56f8a1314ffc))
+
 ## [1.1.0](https://github.com/kpulka247/novice/compare/v1.0.0...v1.1.0) (2026-11-13)
 
 ### Features
