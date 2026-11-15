@@ -8,7 +8,7 @@ on:
 
 jobs:
   release:
-    name: Create Release & Build
+    name: Create release and build
     runs-on: ubuntu-latest
     outputs:
       new_release_version: ${{ steps.semantic.outputs.new_release_version }}
@@ -32,10 +32,10 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Unit tests
+      - name: Run unit tests
         run: pnpm test
 
-      - name: Create Release and Build
+      - name: Run semantic-release
         id: semantic
         run: pnpm exec semantic-release
         env:
@@ -81,10 +81,9 @@ jobs:
       - name: Publish to Chrome Web Store
         if: env.CHROME_EXTENSION_ID != ''
         run: |
-          pnpm dlx chrome-webstore-upload-cli@4 upload \
+          pnpm dlx chrome-webstore-upload-cli@4 \
             --source dist/novice-${{ needs.release.outputs.new_release_version }}-chrome.zip \
-            --extension-id $CHROME_EXTENSION_ID \
-            --auto-publish
+            --extension-id $CHROME_EXTENSION_ID
         env:
           PUBLISHER_ID: ${{ secrets.CHROME_PUBLISHER_ID }}
           CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
@@ -92,7 +91,7 @@ jobs:
           REFRESH_TOKEN: ${{ secrets.CHROME_REFRESH_TOKEN }}
 
   publish-firefox:
-    name: Publish to Firefox AMO
+    name: Publish to Firefox Add-ons
     needs: release
     runs-on: ubuntu-latest
     if: needs.release.outputs.new_release_version != ''
@@ -111,7 +110,7 @@ jobs:
         with:
           ref: v${{ needs.release.outputs.new_release_version }}
 
-      - name: Pack the source code for the AMO review
+      - name: Pack the source code for the Firefox Add-ons review
         if: env.WEB_EXT_API_KEY != ''
         run: git archive --format=zip --output=/tmp/source-code.zip HEAD
 
@@ -132,7 +131,7 @@ jobs:
         with:
           node-version: 24
 
-      - name: Publish to Firefox AMO
+      - name: Publish to Firefox Add-ons
         if: env.WEB_EXT_API_KEY != ''
         run: |
           pnpm dlx web-ext sign \

@@ -11,6 +11,9 @@ const SEARCH =
 const MIXED =
   "https://www.youtube.com/results?search_query=new+game+trailers+2026";
 const GTA6_PAGE = "https://www.youtube.com/results?search_query=gta+6+trailer";
+const SEARCH_ENGINE =
+  "https://www.bing.com/search?q=rockstar+games&setlang=en-US&cc=US";
+const ARTICLE = "https://en.wikipedia.org/wiki/Take-Two_Interactive";
 const WEB = [
   {
     name: "YouTube",
@@ -40,6 +43,7 @@ const TILE = { width: 640, height: 400, gap: 20 };
 const WIDTH = 1280;
 const HEIGHT = 800;
 const FONT = "Segoe UI, Inter, Arial, sans-serif";
+const CLEAR = { r: 0, g: 0, b: 0, alpha: 0 };
 
 mkdirSync(README_DIR, { recursive: true });
 mkdirSync(STORE_DIR, { recursive: true });
@@ -100,8 +104,8 @@ async function openSite(context, url) {
 async function webGrid(captures) {
   const columns = 2;
   const rows = Math.ceil(captures.length / columns);
-  const width = columns * TILE.width + (columns + 1) * TILE.gap;
-  const height = rows * TILE.height + (rows + 1) * TILE.gap;
+  const width = columns * TILE.width + (columns - 1) * TILE.gap;
+  const height = rows * TILE.height + (rows - 1) * TILE.gap;
   const layers = [];
   for (const [index, { name, image, crop }] of captures.entries()) {
     const source = crop ? sharp(image).extract(crop) : sharp(image);
@@ -111,9 +115,8 @@ async function webGrid(captures) {
       TILE.height,
       12,
     );
-    const left = TILE.gap + (index % columns) * (TILE.width + TILE.gap);
-    const top =
-      TILE.gap + Math.floor(index / columns) * (TILE.height + TILE.gap);
+    const left = (index % columns) * (TILE.width + TILE.gap);
+    const top = Math.floor(index / columns) * (TILE.height + TILE.gap);
     const labelWidth = 24 + name.length * 11;
     const label = Buffer.from(
       `<svg width="${labelWidth}" height="34" xmlns="http://www.w3.org/2000/svg">
@@ -128,10 +131,26 @@ async function webGrid(captures) {
       top: top + TILE.height - 48,
     });
   }
-  return sharp({
-    create: { width, height, channels: 4, background: "#0d0b14" },
-  })
+  return sharp({ create: { width, height, channels: 4, background: CLEAR } })
     .composite(layers)
+    .png()
+    .toBuffer();
+}
+
+async function withPopup(page, popup) {
+  const { width, height } = await sharp(popup).metadata();
+  const inset = 12;
+  const border = Buffer.from(
+    `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+      <rect x="0.5" y="0.5" width="${width - 1}" height="${height - 1}" rx="12" fill="none" stroke="#fff" stroke-opacity="0.12"/>
+    </svg>`,
+  );
+  const left = WIDTH - inset - width;
+  return sharp(await rounded(page, WIDTH, HEIGHT, 12))
+    .composite([
+      { input: await rounded(popup, width, height, 12), left, top: inset },
+      { input: border, left, top: inset },
+    ])
     .png()
     .toBuffer();
 }
@@ -151,6 +170,22 @@ async function popupShot({ context, id }, tabId) {
   await popup.goto(`chrome-extension://${id}/popup.html`);
   await popup.waitForTimeout(800);
   return popup.screenshot({ fullPage: true });
+}
+
+async function hoverShot(page) {
+  const box = await page.evaluate((height) => {
+    const target = [...document.querySelectorAll('[data-novice="blur"]')]
+      .map((el) => el.getBoundingClientRect())
+      .find(
+        (rect) => rect.width > 300 && rect.top > 80 && rect.bottom < height,
+      );
+    return target && { x: target.left + 60, y: target.top + 40 };
+  }, HEIGHT);
+  if (box) await page.mouse.move(box.x, box.y);
+  await page.waitForTimeout(600);
+  const image = await page.screenshot();
+  await page.mouse.move(0, 0);
+  return image;
 }
 
 const escape = (text) => text.replace(/&/g, "&amp;").replace(/</g, "&lt;");
@@ -219,6 +254,7 @@ const setSettings = (patch) =>
 await setSettings({ enabled: true, style: "blur" });
 const blurPage = await openYouTube(english.context, SEARCH);
 const youtubeBlur = await blurPage.screenshot();
+const youtubeHover = await hoverShot(blurPage);
 
 const web = [{ ...WEB[0], image: youtubeBlur }];
 for (const site of WEB.slice(1)) {
@@ -234,13 +270,20 @@ const youtubeHide = await hidePage.screenshot();
 await hidePage.close();
 await setSettings({ style: "blur" });
 
-const [youtubeTab] = await english.worker.evaluate(() =>
-  chrome.tabs.query({ url: "https://www.youtube.com/*" }),
-);
-const popupEnglish = await popupShot(english, youtubeTab.id);
+const searchPage = await openSite(english.context, SEARCH_ENGINE);
+const searchEngine = await searchPage.screenshot();
+await searchPage.close();
+const articlePage = await openSite(english.context, ARTICLE);
+const article = await articlePage.screenshot();
+await articlePage.close();
 
 const shieldPage = await openYouTube(english.context, GTA6_PAGE);
 const shield = await shieldPage.screenshot();
+const [shieldTab] = await english.worker.evaluate(
+  (url) => chrome.tabs.query({ url }),
+  shieldPage.url(),
+);
+const popupEnglish = await popupShot(english, shieldTab.id);
 await english.context.close();
 
 const popups = [popupEnglish];
@@ -255,8 +298,18 @@ for (const lang of ["de", "es"]) {
 }
 
 await sharp(acrossTheWeb).toFile(`${README_DIR}/across-the-web.png`);
-await sharp(shield).toFile(`${README_DIR}/screenshot-shield.png`);
-await sharp(popupEnglish).toFile(`${README_DIR}/screenshot-popup.png`);
+await sharp(await withPopup(shield, popupEnglish)).toFile(
+  `${README_DIR}/screenshot.png`,
+);
+await sharp(await rounded(youtubeHover, WIDTH, HEIGHT, 12)).toFile(
+  `${README_DIR}/screenshot-hover.png`,
+);
+await sharp(await rounded(article, WIDTH, HEIGHT, 12)).toFile(
+  `${README_DIR}/screenshot-article.png`,
+);
+await sharp(await rounded(searchEngine, WIDTH, HEIGHT, 12)).toFile(
+  `${README_DIR}/screenshot-search.png`,
+);
 
 await frame("screenshot-1-blur.png", "Spoilers blur in place. Click to show.", [
   youtubeBlur,

@@ -1,17 +1,17 @@
 <div align="center">
 
-![banner](static/images/banner.png)
+<img src="static/images/banner.png" alt="NoVice banner" width="440">
 
 <a href="https://github.com/kpulka247/novice/actions" title="GitHub Actions Workflow Status"><img src="https://img.shields.io/github/actions/workflow/status/kpulka247/novice/release.yml"></a>
-<a title="Chrome Web Store Size"><img src="https://img.shields.io/chrome-web-store/size/caledcpfdapmmhmflbpjmjnenmjggghp"></a>
-<a href="https://github.com/kpulka247/novice/releases" title="GitHub Release"><img src="https://img.shields.io/github/v/release/kpulka247/novice?logo=github&logoColor=white"></a>
-<a href="https://github.com/kpulka247/novice/blob/main/LICENSE" title="License"><img src="https://img.shields.io/badge/license-source--available-0d0b14"></a>
+<a title="Chrome Web Store Size"><img src="https://img.shields.io/chrome-web-store/size/caledcpfdapmmhmflbpjmjnenmjggghp?color=blue"></a>
+<a href="https://github.com/kpulka247/novice/releases" title="GitHub Release"><img src="https://img.shields.io/github/v/release/kpulka247/novice?logo=github&logoColor=white&color=%236f42c1"></a>
+<a href="https://github.com/kpulka247/novice/blob/main/LICENSE" title="GitHub License"><img src="https://img.shields.io/github/license/kpulka247/novice?color=%23252525"></a>
 
-<a href="https://chromewebstore.google.com/detail/novice-block-gta-6-spoile/caledcpfdapmmhmflbpjmjnenmjggghp" title="Chrome Web Store Users"><img src="https://img.shields.io/chrome-web-store/users/caledcpfdapmmhmflbpjmjnenmjggghp?logo=Google%20Chrome&logoColor=white&color=%23ff3d9a"></a>
-<a href="https://chromewebstore.google.com/detail/novice-block-gta-6-spoile/caledcpfdapmmhmflbpjmjnenmjggghp" title="Chrome Web Store Rating"><img src="https://img.shields.io/chrome-web-store/rating/caledcpfdapmmhmflbpjmjnenmjggghp"></a>
+<a href="https://chromewebstore.google.com/detail/novice-block-gta-6-spoile/caledcpfdapmmhmflbpjmjnenmjggghp" title="Chrome Web Store Users"><img src="https://img.shields.io/chrome-web-store/users/caledcpfdapmmhmflbpjmjnenmjggghp?logo=Google%20Chrome&logoColor=white&color=blue"></a>
+<a href="https://chromewebstore.google.com/detail/novice-block-gta-6-spoile/caledcpfdapmmhmflbpjmjnenmjggghp" title="Chrome Web Store Rating"><img src="https://img.shields.io/chrome-web-store/rating/caledcpfdapmmhmflbpjmjnenmjggghp?color=blue"></a>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<a href="https://addons.mozilla.org/firefox/addon/novice/" title="Mozilla Add-on Users"><img src="https://img.shields.io/amo/users/novice?logo=Firefox&logoColor=white&color=%23ff3d9a"></a>
-<a href="https://addons.mozilla.org/firefox/addon/novice/" title="Mozilla Add-on Rating"><img src="https://img.shields.io/amo/rating/novice"></a>
+<a href="https://addons.mozilla.org/firefox/addon/novice/" title="Mozilla Add-on Users"><img src="https://img.shields.io/amo/users/novice?logo=Firefox&logoColor=white&color=red"></a>
+<a href="https://addons.mozilla.org/firefox/addon/novice/" title="Mozilla Add-on Rating"><img src="https://img.shields.io/amo/rating/novice?color=red"></a>
 
 </div>
 
@@ -33,18 +33,25 @@ Play GTA VI knowing nothing about it. NoVice blurs every trailer, leak, post, an
 
 ## Screenshots
 
-<div align="center">
-<img src="static/images/screenshot-shield.png" alt="A page about GTA VI under the see-through cover" width="68%">
-&nbsp;
-<img src="static/images/screenshot-popup.png" alt="The extension popup" width="28%">
-</div>
+![The extension popup over a page about GTA VI under the see-through cover](static/images/screenshot.png)
+
+<details>
+<summary>More screenshots</summary>
+
+![A blurred YouTube result that shows the matched words on hover](static/images/screenshot-hover.png)
+
+![Bing results for Rockstar Games with the GTA results blurred](static/images/screenshot-search.png)
+
+![The Take-Two Interactive article on Wikipedia with the GTA parts blurred](static/images/screenshot-article.png)
+
+</details>
 
 ## Installation
 
 <div align="center">
 
-<a href="https://chromewebstore.google.com/detail/novice-block-gta-6-spoile/caledcpfdapmmhmflbpjmjnenmjggghp" title="Chrome Web Store Version"><img src="https://img.shields.io/chrome-web-store/v/caledcpfdapmmhmflbpjmjnenmjggghp?style=for-the-badge&logo=google%20chrome&logoColor=white&labelColor=%230d0b14&color=%23ff3d9a"></a>
-<a href="https://addons.mozilla.org/firefox/addon/novice/" title="Mozilla Add-on Version"><img src="https://img.shields.io/amo/v/novice?style=for-the-badge&logo=firefox&logoColor=white&labelColor=%230d0b14&color=%23ffa24c"></a>
+<a href="https://chromewebstore.google.com/detail/novice-block-gta-6-spoile/caledcpfdapmmhmflbpjmjnenmjggghp" title="Chrome Web Store Version"><img src="https://img.shields.io/chrome-web-store/v/caledcpfdapmmhmflbpjmjnenmjggghp?style=for-the-badge&logo=google%20chrome&logoColor=white&labelColor=%23252525&color=blue"></a>
+<a href="https://addons.mozilla.org/firefox/addon/novice/" title="Mozilla Add-on Version"><img src="https://img.shields.io/amo/v/novice?style=for-the-badge&logo=firefox&logoColor=white&labelColor=%23252525&color=red"></a>
 
 </div>
 
@@ -91,7 +98,7 @@ Read **[CONTRIBUTING.md](./CONTRIBUTING.md)** for the project layout, the target
 
 ## License
 
-Source-available, all rights reserved. You can read the code, fork it, and send pull requests. You cannot publish the extension or a modified copy of it in any store or elsewhere. See [LICENSE](./LICENSE).
+[GPL-3.0](./LICENSE). The license covers the code. It does not give you the right to use the NoVice name, logo, or store graphics.
 
 An unofficial fan project, not affiliated with Rockstar Games or Take-Two Interactive. Grand Theft Auto is a trademark of Take-Two Interactive Software, Inc.
 

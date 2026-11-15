@@ -26,10 +26,7 @@ Features:
 🔒 Private. Everything runs on your device. Nothing is collected or sent anywhere.
 🆕 Automatic updates. New terms and fixes are released regularly.
 
-Works on every website, with extra support for:
-
-- YouTube, Reddit, X, Facebook, Instagram, TikTok
-- Twitch, Steam, Google, Bing, DuckDuckGo
+Works on every website. Video sites, social feeds, forums, game stores, and search results get extra handling, so the whole video, post, or comment is blurred, not only the line that mentions the game.
 
 You stay in control. Click the toolbar icon to switch between blur and remove, turn strict mode off, add your own keywords, or turn the extension off for one site.
 
