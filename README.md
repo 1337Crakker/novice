@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="static/images/banner.png" alt="NoVice banner" width="440">
+<p><img src="static/images/banner.png" alt="NoVice banner" width="440"></p>
 
 <a href="https://github.com/kpulka247/novice/actions" title="GitHub Actions Workflow Status"><img src="https://img.shields.io/github/actions/workflow/status/kpulka247/novice/release.yml"></a>
 <a title="Chrome Web Store Size"><img src="https://img.shields.io/chrome-web-store/size/caledcpfdapmmhmflbpjmjnenmjggghp?color=blue"></a>
