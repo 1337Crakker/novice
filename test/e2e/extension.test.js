@@ -429,3 +429,36 @@ test("take me back leaves the cover behind, even if the site keeps its title", a
   assert.equal(await page.title(), "Spa feed");
   await page.close();
 });
+
+test("a revealed unit stays revealed when the site renders it again", async () => {
+  const page = await openFeed();
+  await page.click("#trailer");
+  assert.equal(await stateOf(page, "trailer"), "revealed");
+  await page.$eval("#trailer", (old) => {
+    const fresh = document.createElement("li");
+    fresh.id = "trailer-again";
+    fresh.textContent = old.textContent;
+    old.replaceWith(fresh);
+  });
+  await page.waitForSelector("#trailer-again[data-novice]", {
+    state: "attached",
+  });
+  assert.equal(await stateOf(page, "trailer-again"), "revealed");
+  assert.equal(await stateOf(page, "split"), "blur");
+  await page.close();
+});
+
+test("show anyway holds for the rest of the tab's session", async () => {
+  const page = await context.newPage();
+  await page.goto(`${base}/news/3`);
+  await page.waitForSelector("novice-shield", { state: "attached" });
+  await page.keyboard.press("Tab");
+  await page.keyboard.press("Enter");
+  await page.waitForSelector("novice-shield", { state: "detached" });
+  await page.goto(`${base}/news/4`);
+  await page.waitForSelector("novice-shield", { state: "attached" });
+  await page.goto(`${base}/news/3`);
+  await page.waitForTimeout(300);
+  assert.equal(await page.$("novice-shield"), null);
+  await page.close();
+});

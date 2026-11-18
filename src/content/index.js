@@ -7,15 +7,16 @@ import {
   onSettingsChange,
 } from "../settings.js";
 import { WATCHED_ATTRS, createBlocker, termLabel } from "./blocker.js";
+import { createReveals } from "./reveals.js";
 import { BLOCKED_TITLE, createShield } from "./shield.js";
 
 const host = location.hostname;
 const isTopFrame = window === window.top;
-const blocker = createBlocker(host);
+const reveals = createReveals();
+const blocker = createBlocker(host, reveals);
 
 let settings = DEFAULT_SETTINGS;
 let keywords = null;
-let revealedHref = null;
 const siteTitles = new Map();
 let lastHref = location.href;
 let lastReported = -1;
@@ -27,13 +28,13 @@ const shield = createShield({
     else ext.runtime.sendMessage({ type: "close-tab" });
   },
   onReveal: () => {
-    revealedHref = location.href;
+    reveals.addPage(location.href);
     sync();
   },
 });
 
 function isActive() {
-  return blocksOn(settings, host) && revealedHref !== location.href;
+  return blocksOn(settings, host) && !reveals.hasPage(location.href);
 }
 
 const gta6Only = (match) => (match?.level === "gta6" ? match : null);
