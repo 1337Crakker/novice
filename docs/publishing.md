@@ -35,7 +35,7 @@ The two publish jobs finish with a notice that says the store secrets are not se
 ## 3. Upload the first version to Firefox Add-ons
 
 1. Open the [Firefox Add-on Developer Hub](https://addons.mozilla.org/developers/) and click **Submit a New Add-on**.
-2. Choose **On this site** and upload `novice-<version>-firefox.zip` from the latest GitHub Release. The add-on ID is `novice@kpulka.com`.
+2. Choose **On this site** and upload `novice-<version>-firefox.zip` from the latest GitHub Release. The add-on ID is `novice@kpulka.com`. Under compatibility, select both **Firefox** and **Firefox for Android**. The manifest supports Android from Firefox 142.
 
 3. When the form asks whether you use a build tool or minifier, answer **Yes**. Upload **Source code (zip)** from the same GitHub Release. Reviewers build it with `pnpm install && pnpm build`, as the README says.
 4. Fill in the listing from [store-listing.md](store-listing.md). Set the add-on URL to `novice`, because the README badges point to `addons.mozilla.org/firefox/addon/novice/`. For the license, choose **GNU General Public License v3.0**. Then upload the same five screenshots.

@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import {
   compileKeywords,
   findSpoiler,
+  findStorySpoiler,
   findUrlSpoiler,
 } from "../../src/spoilers.js";
 
@@ -312,4 +313,33 @@ test("no keywords means nothing extra is blocked", () => {
   assert.equal(compileKeywords([]), null);
   assert.equal(compileKeywords(["   ", "---"]), null);
   assert.equal(findSpoiler("hello world", compileKeywords([])), null);
+});
+
+test("story words alone are a story spoiler that never names its words", () => {
+  for (const text of [
+    "lol the ending where she betrays him",
+    "that plot twist in the final mission",
+    "the post-credits scene",
+    "she dies at the end",
+    "zakończenie jest smutne",
+    "Концовка",
+  ]) {
+    assert.deepEqual(
+      findStorySpoiler(text),
+      { level: "gta6", term: null },
+      text,
+    );
+  }
+});
+
+test("story words need whole words", () => {
+  for (const text of [
+    "pending review",
+    "Red Dead Redemption",
+    "final trailer tomorrow",
+    "studies show",
+    "",
+  ]) {
+    assert.equal(findStorySpoiler(text), null, text);
+  }
 });

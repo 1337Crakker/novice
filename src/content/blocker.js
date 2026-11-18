@@ -1,4 +1,9 @@
-import { compileKeywords, findSpoiler, findUrlSpoiler } from "../spoilers.js";
+import {
+  compileKeywords,
+  findSpoiler,
+  findStorySpoiler,
+  findUrlSpoiler,
+} from "../spoilers.js";
 import { expanderSelectorFor, findEmptiedShelf, findUnit } from "../sites.js";
 import { ext } from "../settings.js";
 
@@ -121,10 +126,11 @@ export function termLabel(term) {
 const isGta6 = (match) => match?.level === "gta6";
 const stronger = (a, b) => (isGta6(a) ? a : isGta6(b) ? b : (a ?? b));
 
-export function createBlocker(host) {
+export function createBlocker(host, reveals) {
   let strict = true;
   let style = "blur";
   let keywords = null;
+  let aboutGta = false;
   const expanderSelector = expanderSelectorFor(host);
   const pendingExpanders = new Set();
   let chipWidthsInstalled = false;
@@ -142,7 +148,11 @@ export function createBlocker(host) {
 
   const accept = (match) =>
     match?.level === "franchise" && !strict ? null : match;
-  const matchOf = (text) => accept(findSpoiler(text, keywords));
+  const matchOf = (text) =>
+    stronger(
+      accept(findSpoiler(text, keywords)),
+      aboutGta ? findStorySpoiler(text) : null,
+    );
 
   const isSkipped = (element) =>
     SKIPPED.has(element.tagName) ||
@@ -186,6 +196,8 @@ export function createBlocker(host) {
     if (element.closest(REVEALED)) return;
     const covered = element.closest(COVERED);
     if (covered) {
+      // The unit may have been covered before the links that name it loaded.
+      if (reveals.hasUnit(covered)) return clear(covered, "revealed");
       if (isGta6(match) && covered.getAttribute(LEVEL) !== "gta6") {
         label(covered, match);
       }
@@ -193,6 +205,7 @@ export function createBlocker(host) {
     }
     const unit = findUnit(element, host);
     if (!unit || unit.closest(`[${STATE}]`)) return;
+    if (reveals.hasUnit(unit)) return unit.setAttribute(STATE, "revealed");
     cover(unit, match);
     if (style === "hide") {
       const isGone = (el) => el.closest(COVERED) || el.querySelector(COVERED);
@@ -310,7 +323,8 @@ export function createBlocker(host) {
         checkElement(element);
       }
     },
-    configure(settings) {
+    configure(settings, pageAboutGta) {
+      aboutGta = pageAboutGta;
       strict = settings.strict;
       style = settings.style;
       keywords = compileKeywords(settings.keywords);
@@ -319,6 +333,7 @@ export function createBlocker(host) {
       return target instanceof Element ? target.closest(BLURRED) : null;
     },
     reveal(unit) {
+      reveals.addUnit(unit);
       clear(unit, "revealed");
     },
     clearAll() {

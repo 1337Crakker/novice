@@ -181,6 +181,35 @@ const FRANCHISE_TERMS = {
   ],
 };
 
+// Too common to block alone, so they count only on pages about GTA.
+const STORY_TERMS = {
+  spoilers: [
+    ["endings?"],
+    ["plot", "twist"],
+    ["(?:final|last)", "mission"],
+    ["post", "credits?"],
+    ["credits", "scene"],
+    ["(?:dies|died)"],
+    ["(?:gets|got|was|were)", "killed"],
+    ["betray(?:s|ed|al)?"],
+    ["zakończeni[eau]"],
+    ["(?:ostatnia|finałowa)", "misja"],
+    ["(?:ginie|zginął|zginęła|zginie)"],
+    ["zdrad(?:a|y|ził|ziła)"],
+    ["final", "del", "juego"],
+    ["(?:muere|murió)"],
+    ["traici(?:ón|ona)"],
+    ["(?:meurt|trahison)"],
+    ["fin", "du", "jeu"],
+    ["(?:stirbt|verrat)"],
+    ["ende", "des", "spiels"],
+    ["(?:morre|morreu|traição)"],
+    ["final", "do", "jogo"],
+    ["концовк[аиуе]"],
+    ["(?:умирает|умер|предательство)"],
+  ],
+};
+
 const SEP = "[\\s\\-_.+:'’#·•・]*";
 const LETTER = "[\\p{Script=Latin}\\p{Script=Cyrillic}\\p{Script=Greek}]";
 const WORD_CHAR = `(?:${LETTER}|\\p{N})`;
@@ -202,6 +231,7 @@ const compile = (groups, end) =>
 
 const EXPLICIT = compile(EXPLICIT_TERMS, `(?!${WORD_CHAR})`);
 const FRANCHISE = compile(FRANCHISE_TERMS, `(?!${LETTER})`);
+const STORY = compile(STORY_TERMS, `(?!${WORD_CHAR})`);
 
 const ROCKSTAR_SOURCES = [
   /^https?:\/\/(?:www\.)?rockstargames\.com(?:[/?#]|$)/i,
@@ -278,6 +308,10 @@ export function findSpoiler(text, keywords = null) {
     find(keywords, cleaned, "gta6") ??
     find(FRANCHISE, cleaned, "franchise")
   );
+}
+
+export function findStorySpoiler(text) {
+  return text ? find(STORY, clean(text), "gta6") : null;
 }
 
 export function findUrlSpoiler(url, keywords = null) {

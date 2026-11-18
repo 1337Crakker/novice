@@ -99,6 +99,18 @@ const SITE_UNITS = [
       "article",
       "[data-test-selector='search-result-card']",
     ],
+    subjects: [
+      "[data-a-target='stream-title']",
+      "[data-a-target='stream-game-link']",
+    ],
+  },
+  {
+    hosts: /(^|\.)kick\.com$/,
+    units: [],
+    subjects: [
+      "[data-testid='livestream-title']",
+      "#channel-content a[href^='/category/']",
+    ],
   },
   {
     hosts: /(^|\.)google\.[a-z.]+$/,
@@ -155,7 +167,16 @@ const PAGE_ROOTS = new Set(["HTML", "BODY", "MAIN"]);
 const siteFor = (host) => SITE_UNITS.find(({ hosts }) => hosts.test(host));
 
 function unitSelectorFor(host) {
-  return siteFor(host)?.units.join(",") ?? null;
+  return siteFor(host)?.units.join(",") || null;
+}
+
+// Subjects name what the page shows when its title does not, such as the
+// stream title and game on a channel page. Only the first match of each
+// counts, since later ones belong to past streams and other channels.
+export function findSubjects(host) {
+  return (siteFor(host)?.subjects ?? [])
+    .map((selector) => document.querySelector(selector))
+    .filter(Boolean);
 }
 
 export function findEmptiedShelf(unit, host, isGone) {

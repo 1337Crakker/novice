@@ -38,6 +38,7 @@ export function createShield({ onLeave, onReveal }) {
       return shown;
     },
     show(reason) {
+      const opening = !shown;
       shown = true;
       root.querySelector(".found").textContent =
         `${t("shieldFound")} ${reason}`;
@@ -45,6 +46,7 @@ export function createShield({ onLeave, onReveal }) {
       const html = document.documentElement;
       html.setAttribute(SHIELD_ATTR, "");
       if (html.lastElementChild !== host) html.appendChild(host);
+      if (opening) root.querySelector(".leave").focus();
       if (document.title !== BLOCKED_TITLE) document.title = BLOCKED_TITLE;
       document.querySelectorAll("video, audio").forEach((m) => m.pause());
     },

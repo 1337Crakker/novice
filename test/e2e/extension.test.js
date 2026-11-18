@@ -15,9 +15,18 @@ let context;
 let worker;
 let extensionId;
 
+const FIXTURES = {
+  "/feed": "feed.html",
+  "/forum": "forum.html",
+  "/spa": "spa.html",
+};
+
 before(async () => {
   server = http.createServer(async (req, res) => {
-    const name = req.url.startsWith("/feed") ? "feed.html" : "article.html";
+    const route = Object.keys(FIXTURES).find((prefix) =>
+      req.url.startsWith(prefix),
+    );
+    const name = FIXTURES[route] ?? "article.html";
     res.setHeader("content-type", "text/html");
     res.end(await readFile(path.join(here, "fixtures", name)));
   });
@@ -41,6 +50,12 @@ before(async () => {
     route.fulfill({
       contentType: "text/html",
       body: await readFile(path.join(here, "fixtures", "facebook.html")),
+    }),
+  );
+  await context.route("https://kick.com/**", async (route) =>
+    route.fulfill({
+      contentType: "text/html",
+      body: await readFile(path.join(here, "fixtures", "kick.html")),
     }),
   );
 });
@@ -332,11 +347,10 @@ test("a blurred unit the site made click-through still takes the click", async (
   await page.close();
 });
 
-test("show anyway reveals the covered page", async () => {
+test("the cover takes focus, and show anyway reveals the covered page", async () => {
   const page = await context.newPage();
   await page.goto(`${base}/news/2`);
   await page.waitForSelector("novice-shield", { state: "attached" });
-  await page.keyboard.press("Tab");
   await page.keyboard.press("Tab");
   await page.keyboard.press("Enter");
   await page.waitForSelector("novice-shield", { state: "detached" });
@@ -386,4 +400,79 @@ test("popup switches turn blurring off globally and per site", async () => {
 
   await popup.close();
   await feed.close();
+});
+
+test("on a page about GTA, vague story spoilers are blurred too", async () => {
+  const page = await context.newPage();
+  await page.goto(`${base}/forum`);
+  await page.waitForSelector("#twist[data-novice]", { state: "attached" });
+  assert.equal(await stateOf(page, "vague"), "blur");
+  assert.equal(await levelOf(page, "vague"), "gta6");
+  for (const id of ["heist", "red-dead"]) {
+    assert.equal(await stateOf(page, id), "visible", `${id} should stay clear`);
+  }
+  await page.close();
+});
+
+test("the cover stays visible on pages that hide undefined elements", async () => {
+  const page = await context.newPage();
+  await page.goto(`${base}/news/1`);
+  await page.addStyleTag({ content: ":not(:defined) { visibility: hidden }" });
+  await page.waitForSelector("novice-shield", { state: "visible" });
+  await page.close();
+});
+
+test("take me back leaves the cover behind, even if the site keeps its title", async () => {
+  const page = await context.newPage();
+  await page.goto(`${base}/spa`);
+  await page.waitForSelector("#post[data-novice]", { state: "attached" });
+  await page.click("#post");
+  await page.click("#open");
+  await page.waitForSelector("novice-shield", { state: "attached" });
+  await page.keyboard.press("Enter");
+  await page.waitForURL(`${base}/spa`);
+  await page.waitForSelector("novice-shield", { state: "detached" });
+  assert.equal(await page.title(), "Spa feed");
+  await page.close();
+});
+
+test("a revealed unit stays revealed when the site renders it again", async () => {
+  const page = await openFeed();
+  await page.click("#trailer");
+  assert.equal(await stateOf(page, "trailer"), "revealed");
+  await page.$eval("#trailer", (old) => {
+    const fresh = document.createElement("li");
+    fresh.id = "trailer-again";
+    fresh.textContent = old.textContent;
+    old.replaceWith(fresh);
+  });
+  await page.waitForSelector("#trailer-again[data-novice]", {
+    state: "attached",
+  });
+  assert.equal(await stateOf(page, "trailer-again"), "revealed");
+  assert.equal(await stateOf(page, "split"), "blur");
+  await page.close();
+});
+
+test("show anyway holds for the rest of the tab's session", async () => {
+  const page = await context.newPage();
+  await page.goto(`${base}/news/3`);
+  await page.waitForSelector("novice-shield", { state: "attached" });
+  await page.keyboard.press("Tab");
+  await page.keyboard.press("Enter");
+  await page.waitForSelector("novice-shield", { state: "detached" });
+  await page.goto(`${base}/news/4`);
+  await page.waitForSelector("novice-shield", { state: "attached" });
+  await page.goto(`${base}/news/3`);
+  await page.waitForTimeout(300);
+  assert.equal(await page.$("novice-shield"), null);
+  await page.close();
+});
+
+test("covers a stream whose game is GTA VI, though the page title never says so", async () => {
+  const page = await context.newPage();
+  await page.goto("https://kick.com/streamer");
+  await page.waitForSelector("novice-shield", { state: "attached" });
+  assert.equal(await page.title(), "Spoiler ahead");
+  await page.close();
 });

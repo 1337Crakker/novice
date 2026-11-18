@@ -6,18 +6,21 @@ import {
   getSettings,
   onSettingsChange,
 } from "../settings.js";
+import { findSubjects } from "../sites.js";
 import { WATCHED_ATTRS, createBlocker, termLabel } from "./blocker.js";
+import { createReveals } from "./reveals.js";
 import { BLOCKED_TITLE, createShield } from "./shield.js";
 
 const host = location.hostname;
 const isTopFrame = window === window.top;
-const blocker = createBlocker(host);
+const reveals = createReveals();
+const blocker = createBlocker(host, reveals);
 
 let settings = DEFAULT_SETTINGS;
 let keywords = null;
-let revealedHref = null;
-let siteTitle = "";
+const siteTitles = new Map();
 let lastHref = location.href;
+let lastSubjects = "";
 let lastReported = -1;
 let appliedConfig = "off";
 
@@ -27,30 +30,47 @@ const shield = createShield({
     else ext.runtime.sendMessage({ type: "close-tab" });
   },
   onReveal: () => {
-    revealedHref = location.href;
+    reveals.addPage(location.href);
     sync();
   },
 });
 
 function isActive() {
-  return blocksOn(settings, host) && revealedHref !== location.href;
+  return blocksOn(settings, host) && !reveals.hasPage(location.href);
 }
 
-const gta6Only = (match) => (match?.level === "gta6" ? match : null);
-
-function pageSpoiler() {
-  return (
-    gta6Only(findUrlSpoiler(location.href, keywords)) ??
-    gta6Only(findSpoiler(siteTitle, keywords))
-  );
+function pageMatches() {
+  return [
+    findUrlSpoiler(location.href, keywords),
+    findSpoiler(siteTitle(), keywords),
+    ...findSubjects(host).flatMap((subject) => [
+      findSpoiler(subject.textContent, keywords),
+      subject.href ? findUrlSpoiler(subject.href, keywords) : null,
+    ]),
+  ].filter(Boolean);
 }
+
+const pageSpoiler = () =>
+  pageMatches().find((match) => match.level === "gta6") ?? null;
+const isAboutGta = () => pageMatches().length > 0;
+
+const subjectsText = () =>
+  findSubjects(host)
+    .map((subject) => `${subject.textContent} ${subject.href ?? ""}`)
+    .join("\n");
+
+// Titles are kept per URL, so a site that keeps its title on Back cannot lend
+// this page the title of the page it left.
+const siteTitle = () => siteTitles.get(location.href) ?? "";
 
 function readSiteTitle() {
-  if (document.title !== BLOCKED_TITLE) siteTitle = document.title;
+  if (document.title !== BLOCKED_TITLE) {
+    siteTitles.set(location.href, document.title);
+  }
 }
 
 function restoreTitle() {
-  if (document.title === BLOCKED_TITLE) document.title = siteTitle;
+  if (document.title === BLOCKED_TITLE) document.title = siteTitle();
 }
 
 function count() {
@@ -70,13 +90,14 @@ function report() {
 function sync() {
   readSiteTitle();
   const active = isActive();
+  const aboutGta = active && isAboutGta();
   const config = active
-    ? `on:${settings.strict}:${settings.style}:${settings.keywords.join("\n")}`
+    ? `on:${settings.strict}:${settings.style}:${aboutGta}:${settings.keywords.join("\n")}`
     : "off";
   if (config !== appliedConfig) {
     appliedConfig = config;
     blocker.clearAll();
-    blocker.configure(settings);
+    blocker.configure(settings, aboutGta);
     if (active) blocker.scan(document.documentElement);
   }
   const spoiler = active ? pageSpoiler() : null;
@@ -98,9 +119,16 @@ function handleMutations(records) {
     }
   }
   const titleChanged =
-    document.title !== BLOCKED_TITLE && document.title !== siteTitle;
-  if (titleChanged || location.href !== lastHref || shield.shown) {
+    document.title !== BLOCKED_TITLE && document.title !== siteTitle();
+  const subjects = subjectsText();
+  if (
+    titleChanged ||
+    location.href !== lastHref ||
+    subjects !== lastSubjects ||
+    shield.shown
+  ) {
     lastHref = location.href;
+    lastSubjects = subjects;
     sync();
   } else {
     report();
@@ -139,6 +167,8 @@ function start() {
     attributes: true,
     attributeFilter: WATCHED_ATTRS,
   });
+
+  window.addEventListener("popstate", () => handleMutations([]));
 
   for (const type of GUARDED_EVENTS) {
     window.addEventListener(type, revealOnActivate, true);
