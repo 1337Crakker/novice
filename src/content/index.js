@@ -6,6 +6,7 @@ import {
   getSettings,
   onSettingsChange,
 } from "../settings.js";
+import { findSubjects } from "../sites.js";
 import { WATCHED_ATTRS, createBlocker, termLabel } from "./blocker.js";
 import { createReveals } from "./reveals.js";
 import { BLOCKED_TITLE, createShield } from "./shield.js";
@@ -19,6 +20,7 @@ let settings = DEFAULT_SETTINGS;
 let keywords = null;
 const siteTitles = new Map();
 let lastHref = location.href;
+let lastSubjects = "";
 let lastReported = -1;
 let appliedConfig = "off";
 
@@ -37,21 +39,25 @@ function isActive() {
   return blocksOn(settings, host) && !reveals.hasPage(location.href);
 }
 
-const gta6Only = (match) => (match?.level === "gta6" ? match : null);
-
-function pageSpoiler() {
-  return (
-    gta6Only(findUrlSpoiler(location.href, keywords)) ??
-    gta6Only(findSpoiler(siteTitle(), keywords))
-  );
+function pageMatches() {
+  return [
+    findUrlSpoiler(location.href, keywords),
+    findSpoiler(siteTitle(), keywords),
+    ...findSubjects(host).flatMap((subject) => [
+      findSpoiler(subject.textContent, keywords),
+      subject.href ? findUrlSpoiler(subject.href, keywords) : null,
+    ]),
+  ].filter(Boolean);
 }
 
-function isAboutGta() {
-  return Boolean(
-    findUrlSpoiler(location.href, keywords) ??
-      findSpoiler(siteTitle(), keywords),
-  );
-}
+const pageSpoiler = () =>
+  pageMatches().find((match) => match.level === "gta6") ?? null;
+const isAboutGta = () => pageMatches().length > 0;
+
+const subjectsText = () =>
+  findSubjects(host)
+    .map((subject) => `${subject.textContent} ${subject.href ?? ""}`)
+    .join("\n");
 
 // Titles are kept per URL, so a site that keeps its title on Back cannot lend
 // this page the title of the page it left.
@@ -114,8 +120,15 @@ function handleMutations(records) {
   }
   const titleChanged =
     document.title !== BLOCKED_TITLE && document.title !== siteTitle();
-  if (titleChanged || location.href !== lastHref || shield.shown) {
+  const subjects = subjectsText();
+  if (
+    titleChanged ||
+    location.href !== lastHref ||
+    subjects !== lastSubjects ||
+    shield.shown
+  ) {
     lastHref = location.href;
+    lastSubjects = subjects;
     sync();
   } else {
     report();

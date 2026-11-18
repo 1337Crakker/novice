@@ -52,6 +52,12 @@ before(async () => {
       body: await readFile(path.join(here, "fixtures", "facebook.html")),
     }),
   );
+  await context.route("https://kick.com/**", async (route) =>
+    route.fulfill({
+      contentType: "text/html",
+      body: await readFile(path.join(here, "fixtures", "kick.html")),
+    }),
+  );
 });
 
 after(async () => {
@@ -460,5 +466,13 @@ test("show anyway holds for the rest of the tab's session", async () => {
   await page.goto(`${base}/news/3`);
   await page.waitForTimeout(300);
   assert.equal(await page.$("novice-shield"), null);
+  await page.close();
+});
+
+test("covers a stream whose game is GTA VI, though the page title never says so", async () => {
+  const page = await context.newPage();
+  await page.goto("https://kick.com/streamer");
+  await page.waitForSelector("novice-shield", { state: "attached" });
+  assert.equal(await page.title(), "Spoiler ahead");
   await page.close();
 });

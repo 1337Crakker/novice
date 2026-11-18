@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Streamer Live Stream - Watch Live on KICK</title>
+  </head>
+  <body>
+    <main id="channel-content"></main>
+    <script>
+      setTimeout(() => {
+        document.getElementById("channel-content").innerHTML = `
+          <h2 data-testid="livestream-title">Day one, no breaks</h2>
+          <a href="/category/grand-theft-auto-vi">Grand Theft Auto VI</a>`;
+      }, 300);
+    </script>
+  </body>
+</html>
