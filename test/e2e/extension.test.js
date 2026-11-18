@@ -332,11 +332,10 @@ test("a blurred unit the site made click-through still takes the click", async (
   await page.close();
 });
 
-test("show anyway reveals the covered page", async () => {
+test("the cover takes focus, and show anyway reveals the covered page", async () => {
   const page = await context.newPage();
   await page.goto(`${base}/news/2`);
   await page.waitForSelector("novice-shield", { state: "attached" });
-  await page.keyboard.press("Tab");
   await page.keyboard.press("Tab");
   await page.keyboard.press("Enter");
   await page.waitForSelector("novice-shield", { state: "detached" });
@@ -386,4 +385,12 @@ test("popup switches turn blurring off globally and per site", async () => {
 
   await popup.close();
   await feed.close();
+});
+
+test("the cover stays visible on pages that hide undefined elements", async () => {
+  const page = await context.newPage();
+  await page.goto(`${base}/news/1`);
+  await page.addStyleTag({ content: ":not(:defined) { visibility: hidden }" });
+  await page.waitForSelector("novice-shield", { state: "visible" });
+  await page.close();
 });
