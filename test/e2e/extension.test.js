@@ -339,7 +339,7 @@ test("covers a page whose URL is about GTA VI before it renders", async () => {
   await page.close();
 });
 
-test("leaves NoVice's own repository alone, and only that one", async () => {
+test("leaves NoVice's own front page alone, but not its issues", async () => {
   await context.route("https://github.com/**", async (route) =>
     route.fulfill({
       contentType: "text/html",
@@ -352,8 +352,14 @@ test("leaves NoVice's own repository alone, and only that one", async () => {
   assert.equal(await page.$("novice-shield"), null);
   assert.equal(await page.$("[data-novice]"), null);
   assert.equal(await page.title(), "GTA 6 ending explained");
-  await page.goto("https://github.com/someone/gta6-mods");
+  // GitHub opens an issue without reloading the page.
+  await page.evaluate(() => {
+    history.pushState(null, "", "/kpulka247/novice/issues/1");
+    document.title = "Spoiler report: GTA 6";
+  });
   await page.waitForSelector("novice-shield", { state: "attached" });
+  await page.goBack();
+  await page.waitForSelector("novice-shield", { state: "detached" });
   await page.close();
 });
 

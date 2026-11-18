@@ -242,10 +242,13 @@ const ROCKSTAR_SOURCES = [
   /^https?:\/\/(?:www\.)?twitch\.tv\/rockstargames(?:[/?#]|$)/i,
 ];
 
-// NoVice's own repository talks about GTA VI everywhere, but holds no spoilers.
-const NOVICE_REPO = /^https:\/\/github\.com\/kpulka247\/novice(?:[/?#]|$)/i;
+// The pages of NoVice's repository that only its maintainer writes: the front
+// page and the files on its own branches. Issues, pull requests, commits and
+// file views at a commit hash can show anyone's text, so they stay protected.
+const NOVICE_PAGES =
+  /^https:\/\/github\.com\/kpulka247\/novice(?:\/(?:tree|blob)\/(?:main|dev)(?:[/?#]|$)|\/?(?:[?#]|$))/i;
 
-export const isNoviceRepo = (url) => NOVICE_REPO.test(url);
+export const isNovicePage = (url) => NOVICE_PAGES.test(url);
 
 // Channel links catch a creator's posts even where the card hides their name.
 const CREATOR_HANDLES = [

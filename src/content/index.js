@@ -2,7 +2,7 @@ import {
   compileKeywords,
   findSpoiler,
   findUrlSpoiler,
-  isNoviceRepo,
+  isNovicePage,
 } from "../spoilers.js";
 import {
   DEFAULT_SETTINGS,
@@ -44,7 +44,7 @@ function isActive() {
   return (
     blocksOn(settings, host) &&
     !reveals.hasPage(location.href) &&
-    !isNoviceRepo(location.href)
+    !isNovicePage(location.href)
   );
 }
 

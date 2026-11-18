@@ -5,7 +5,7 @@ import {
   findSpoiler,
   findStorySpoiler,
   findUrlSpoiler,
-  isNoviceRepo,
+  isNovicePage,
 } from "../../src/spoilers.js";
 
 const spoilerLevel = (text) => findSpoiler(text)?.level ?? null;
@@ -247,23 +247,32 @@ test("allows other URLs", () => {
   }
 });
 
-test("knows NoVice's own repository", () => {
+test("knows the pages of NoVice's repository that only its maintainer writes", () => {
   for (const url of [
     "https://github.com/kpulka247/novice",
     "https://github.com/kpulka247/novice/",
-    "https://github.com/kpulka247/novice/issues/1",
     "https://github.com/kpulka247/novice?tab=readme",
     "https://github.com/kpulka247/novice#readme",
+    "https://github.com/kpulka247/novice/tree/dev",
+    "https://github.com/kpulka247/novice/tree/main/src",
+    "https://github.com/kpulka247/novice/blob/main/CONTRIBUTING.md",
   ]) {
-    assert.equal(isNoviceRepo(url), true, url);
+    assert.equal(isNovicePage(url), true, url);
   }
   for (const url of [
+    "https://github.com/kpulka247/novice/issues/1",
+    "https://github.com/kpulka247/novice/pulls",
+    "https://github.com/kpulka247/novice/discussions",
+    "https://github.com/kpulka247/novice/releases",
+    "https://github.com/kpulka247/novice/commit/1ded695",
+    "https://github.com/kpulka247/novice/blob/1ded695/README.md",
+    "https://github.com/kpulka247/novice/tree/main-fork",
     "https://github.com/kpulka247/novice-fan",
     "https://github.com/someone/novice",
     "https://example.com/?ref=https://github.com/kpulka247/novice",
     "https://github.com.evil.example/kpulka247/novice",
   ]) {
-    assert.equal(isNoviceRepo(url), false, url);
+    assert.equal(isNovicePage(url), false, url);
   }
 });
 
