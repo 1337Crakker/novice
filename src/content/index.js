@@ -1,4 +1,9 @@
-import { compileKeywords, findSpoiler, findUrlSpoiler } from "../spoilers.js";
+import {
+  compileKeywords,
+  findSpoiler,
+  findUrlSpoiler,
+  isNoviceRepo,
+} from "../spoilers.js";
 import {
   DEFAULT_SETTINGS,
   blocksOn,
@@ -36,7 +41,11 @@ const shield = createShield({
 });
 
 function isActive() {
-  return blocksOn(settings, host) && !reveals.hasPage(location.href);
+  return (
+    blocksOn(settings, host) &&
+    !reveals.hasPage(location.href) &&
+    !isNoviceRepo(location.href)
+  );
 }
 
 function pageMatches() {

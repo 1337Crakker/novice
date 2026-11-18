@@ -5,6 +5,7 @@ import {
   findSpoiler,
   findStorySpoiler,
   findUrlSpoiler,
+  isNoviceRepo,
 } from "../../src/spoilers.js";
 
 const spoilerLevel = (text) => findSpoiler(text)?.level ?? null;
@@ -243,6 +244,26 @@ test("allows other URLs", () => {
     "https://www.gtabase.com/",
   ]) {
     assert.equal(urlMentionsGta6(url), false, url);
+  }
+});
+
+test("knows NoVice's own repository", () => {
+  for (const url of [
+    "https://github.com/kpulka247/novice",
+    "https://github.com/kpulka247/novice/",
+    "https://github.com/kpulka247/novice/issues/1",
+    "https://github.com/kpulka247/novice?tab=readme",
+    "https://github.com/kpulka247/novice#readme",
+  ]) {
+    assert.equal(isNoviceRepo(url), true, url);
+  }
+  for (const url of [
+    "https://github.com/kpulka247/novice-fan",
+    "https://github.com/someone/novice",
+    "https://example.com/?ref=https://github.com/kpulka247/novice",
+    "https://github.com.evil.example/kpulka247/novice",
+  ]) {
+    assert.equal(isNoviceRepo(url), false, url);
   }
 });
 

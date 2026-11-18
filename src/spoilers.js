@@ -242,6 +242,11 @@ const ROCKSTAR_SOURCES = [
   /^https?:\/\/(?:www\.)?twitch\.tv\/rockstargames(?:[/?#]|$)/i,
 ];
 
+// NoVice's own repository talks about GTA VI everywhere, but holds no spoilers.
+const NOVICE_REPO = /^https:\/\/github\.com\/kpulka247\/novice(?:[/?#]|$)/i;
+
+export const isNoviceRepo = (url) => NOVICE_REPO.test(url);
+
 // Channel links catch a creator's posts even where the card hides their name.
 const CREATOR_HANDLES = [
   "darkviperau",

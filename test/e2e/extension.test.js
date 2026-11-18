@@ -339,6 +339,24 @@ test("covers a page whose URL is about GTA VI before it renders", async () => {
   await page.close();
 });
 
+test("leaves NoVice's own repository alone, and only that one", async () => {
+  await context.route("https://github.com/**", async (route) =>
+    route.fulfill({
+      contentType: "text/html",
+      body: await readFile(path.join(here, "fixtures", "article.html")),
+    }),
+  );
+  const page = await context.newPage();
+  await page.goto("https://github.com/kpulka247/novice");
+  await page.waitForTimeout(500);
+  assert.equal(await page.$("novice-shield"), null);
+  assert.equal(await page.$("[data-novice]"), null);
+  assert.equal(await page.title(), "GTA 6 ending explained");
+  await page.goto("https://github.com/someone/gta6-mods");
+  await page.waitForSelector("novice-shield", { state: "attached" });
+  await page.close();
+});
+
 test("a blurred unit the site made click-through still takes the click", async () => {
   const page = await openFeed();
   const box = await page.locator("#ghost").boundingBox();
