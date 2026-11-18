@@ -17,7 +17,11 @@ let extensionId;
 
 before(async () => {
   server = http.createServer(async (req, res) => {
-    const name = req.url.startsWith("/feed") ? "feed.html" : "article.html";
+    const name = req.url.startsWith("/feed")
+      ? "feed.html"
+      : req.url.startsWith("/forum")
+        ? "forum.html"
+        : "article.html";
     res.setHeader("content-type", "text/html");
     res.end(await readFile(path.join(here, "fixtures", name)));
   });
@@ -385,6 +389,18 @@ test("popup switches turn blurring off globally and per site", async () => {
 
   await popup.close();
   await feed.close();
+});
+
+test("on a page about GTA, vague story spoilers are blurred too", async () => {
+  const page = await context.newPage();
+  await page.goto(`${base}/forum`);
+  await page.waitForSelector("#twist[data-novice]", { state: "attached" });
+  assert.equal(await stateOf(page, "vague"), "blur");
+  assert.equal(await levelOf(page, "vague"), "gta6");
+  for (const id of ["heist", "red-dead"]) {
+    assert.equal(await stateOf(page, id), "visible", `${id} should stay clear`);
+  }
+  await page.close();
 });
 
 test("the cover stays visible on pages that hide undefined elements", async () => {

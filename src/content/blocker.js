@@ -1,4 +1,9 @@
-import { compileKeywords, findSpoiler, findUrlSpoiler } from "../spoilers.js";
+import {
+  compileKeywords,
+  findSpoiler,
+  findStorySpoiler,
+  findUrlSpoiler,
+} from "../spoilers.js";
 import { expanderSelectorFor, findEmptiedShelf, findUnit } from "../sites.js";
 import { ext } from "../settings.js";
 
@@ -125,6 +130,7 @@ export function createBlocker(host) {
   let strict = true;
   let style = "blur";
   let keywords = null;
+  let aboutGta = false;
   const expanderSelector = expanderSelectorFor(host);
   const pendingExpanders = new Set();
   let chipWidthsInstalled = false;
@@ -142,7 +148,11 @@ export function createBlocker(host) {
 
   const accept = (match) =>
     match?.level === "franchise" && !strict ? null : match;
-  const matchOf = (text) => accept(findSpoiler(text, keywords));
+  const matchOf = (text) =>
+    stronger(
+      accept(findSpoiler(text, keywords)),
+      aboutGta ? findStorySpoiler(text) : null,
+    );
 
   const isSkipped = (element) =>
     SKIPPED.has(element.tagName) ||
@@ -310,7 +320,8 @@ export function createBlocker(host) {
         checkElement(element);
       }
     },
-    configure(settings) {
+    configure(settings, pageAboutGta) {
+      aboutGta = pageAboutGta;
       strict = settings.strict;
       style = settings.style;
       keywords = compileKeywords(settings.keywords);

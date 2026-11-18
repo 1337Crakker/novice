@@ -45,6 +45,12 @@ function pageSpoiler() {
   );
 }
 
+function isAboutGta() {
+  return Boolean(
+    findUrlSpoiler(location.href, keywords) ?? findSpoiler(siteTitle, keywords),
+  );
+}
+
 function readSiteTitle() {
   if (document.title !== BLOCKED_TITLE) siteTitle = document.title;
 }
@@ -70,13 +76,14 @@ function report() {
 function sync() {
   readSiteTitle();
   const active = isActive();
+  const aboutGta = active && isAboutGta();
   const config = active
-    ? `on:${settings.strict}:${settings.style}:${settings.keywords.join("\n")}`
+    ? `on:${settings.strict}:${settings.style}:${aboutGta}:${settings.keywords.join("\n")}`
     : "off";
   if (config !== appliedConfig) {
     appliedConfig = config;
     blocker.clearAll();
-    blocker.configure(settings);
+    blocker.configure(settings, aboutGta);
     if (active) blocker.scan(document.documentElement);
   }
   const spoiler = active ? pageSpoiler() : null;
