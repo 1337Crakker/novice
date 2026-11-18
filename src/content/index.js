@@ -16,7 +16,7 @@ const blocker = createBlocker(host);
 let settings = DEFAULT_SETTINGS;
 let keywords = null;
 let revealedHref = null;
-let siteTitle = "";
+const siteTitles = new Map();
 let lastHref = location.href;
 let lastReported = -1;
 let appliedConfig = "off";
@@ -41,22 +41,29 @@ const gta6Only = (match) => (match?.level === "gta6" ? match : null);
 function pageSpoiler() {
   return (
     gta6Only(findUrlSpoiler(location.href, keywords)) ??
-    gta6Only(findSpoiler(siteTitle, keywords))
+    gta6Only(findSpoiler(siteTitle(), keywords))
   );
 }
 
 function isAboutGta() {
   return Boolean(
-    findUrlSpoiler(location.href, keywords) ?? findSpoiler(siteTitle, keywords),
+    findUrlSpoiler(location.href, keywords) ??
+      findSpoiler(siteTitle(), keywords),
   );
 }
 
+// Titles are kept per URL, so a site that keeps its title on Back cannot lend
+// this page the title of the page it left.
+const siteTitle = () => siteTitles.get(location.href) ?? "";
+
 function readSiteTitle() {
-  if (document.title !== BLOCKED_TITLE) siteTitle = document.title;
+  if (document.title !== BLOCKED_TITLE) {
+    siteTitles.set(location.href, document.title);
+  }
 }
 
 function restoreTitle() {
-  if (document.title === BLOCKED_TITLE) document.title = siteTitle;
+  if (document.title === BLOCKED_TITLE) document.title = siteTitle();
 }
 
 function count() {
@@ -105,7 +112,7 @@ function handleMutations(records) {
     }
   }
   const titleChanged =
-    document.title !== BLOCKED_TITLE && document.title !== siteTitle;
+    document.title !== BLOCKED_TITLE && document.title !== siteTitle();
   if (titleChanged || location.href !== lastHref || shield.shown) {
     lastHref = location.href;
     sync();
@@ -146,6 +153,8 @@ function start() {
     attributes: true,
     attributeFilter: WATCHED_ATTRS,
   });
+
+  window.addEventListener("popstate", () => handleMutations([]));
 
   for (const type of GUARDED_EVENTS) {
     window.addEventListener(type, revealOnActivate, true);

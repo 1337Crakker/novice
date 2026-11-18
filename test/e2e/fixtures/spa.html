@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Spa feed</title>
+  </head>
+  <body>
+    <ul id="feed">
+      <li id="post"><a id="open" href="/spa/gta-6-launch-post">Open the post</a></li>
+      <li id="other">Weather today</li>
+    </ul>
+    <script>
+      // Like many single-page apps, this one sets the title when it opens a
+      // page but never restores it on Back.
+      document.getElementById("open").addEventListener("click", (event) => {
+        event.preventDefault();
+        history.pushState({}, "", event.currentTarget.href);
+        document.title = "GTA 6 launch post";
+      });
+    </script>
+  </body>
+</html>

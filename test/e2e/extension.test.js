@@ -15,13 +15,18 @@ let context;
 let worker;
 let extensionId;
 
+const FIXTURES = {
+  "/feed": "feed.html",
+  "/forum": "forum.html",
+  "/spa": "spa.html",
+};
+
 before(async () => {
   server = http.createServer(async (req, res) => {
-    const name = req.url.startsWith("/feed")
-      ? "feed.html"
-      : req.url.startsWith("/forum")
-        ? "forum.html"
-        : "article.html";
+    const route = Object.keys(FIXTURES).find((prefix) =>
+      req.url.startsWith(prefix),
+    );
+    const name = FIXTURES[route] ?? "article.html";
     res.setHeader("content-type", "text/html");
     res.end(await readFile(path.join(here, "fixtures", name)));
   });
@@ -408,5 +413,19 @@ test("the cover stays visible on pages that hide undefined elements", async () =
   await page.goto(`${base}/news/1`);
   await page.addStyleTag({ content: ":not(:defined) { visibility: hidden }" });
   await page.waitForSelector("novice-shield", { state: "visible" });
+  await page.close();
+});
+
+test("take me back leaves the cover behind, even if the site keeps its title", async () => {
+  const page = await context.newPage();
+  await page.goto(`${base}/spa`);
+  await page.waitForSelector("#post[data-novice]", { state: "attached" });
+  await page.click("#post");
+  await page.click("#open");
+  await page.waitForSelector("novice-shield", { state: "attached" });
+  await page.keyboard.press("Enter");
+  await page.waitForURL(`${base}/spa`);
+  await page.waitForSelector("novice-shield", { state: "detached" });
+  assert.equal(await page.title(), "Spa feed");
   await page.close();
 });
