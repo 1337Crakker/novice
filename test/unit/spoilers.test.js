@@ -276,6 +276,41 @@ test("knows the pages of NoVice's repository that only its maintainer writes", (
   }
 });
 
+test("on NoVice's own pages, lets the game's name through and nothing else", () => {
+  const own = { nameAllowed: true };
+  for (const text of [
+    "NoVice - Block GTA 6 Spoilers",
+    "Play GTA VI knowing nothing about it",
+    "Grand Theft Auto VI",
+    "Rockstar Games",
+  ]) {
+    assert.equal(findSpoiler(text, null, own), null, text);
+  }
+  assert.equal(
+    findUrlSpoiler(
+      "https://chromewebstore.google.com/detail/novice-block-gta-6-spoile/caledcpfdapmmhmflbpjmjnenmjggghp",
+      null,
+      own,
+    ),
+    null,
+  );
+  assert.equal(
+    findUrlSpoiler("https://www.rockstargames.com/VI", null, own),
+    null,
+  );
+  for (const text of [
+    "GTA 6: Lucia dies in the last mission",
+    "Jason Duval",
+    "the places of Leonida",
+  ]) {
+    assert.equal(findSpoiler(text, null, own)?.level, "gta6", text);
+  }
+  assert.equal(
+    findSpoiler("GTA 6 has a twist", compileKeywords(["twist"]), own)?.level,
+    "gta6",
+  );
+});
+
 test("names the words that matched", () => {
   assert.deepEqual(findSpoiler("New GTA 6 trailer today"), {
     level: "gta6",

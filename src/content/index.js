@@ -41,20 +41,19 @@ const shield = createShield({
 });
 
 function isActive() {
-  return (
-    blocksOn(settings, host) &&
-    !reveals.hasPage(location.href) &&
-    !isNovicePage(location.href)
-  );
+  return blocksOn(settings, host) && !reveals.hasPage(location.href);
 }
 
+const rules = () => ({ nameAllowed: isNovicePage(location.href) });
+
 function pageMatches() {
+  const page = rules();
   return [
-    findUrlSpoiler(location.href, keywords),
-    findSpoiler(siteTitle(), keywords),
+    findUrlSpoiler(location.href, keywords, page),
+    findSpoiler(siteTitle(), keywords, page),
     ...findSubjects(host).flatMap((subject) => [
-      findSpoiler(subject.textContent, keywords),
-      subject.href ? findUrlSpoiler(subject.href, keywords) : null,
+      findSpoiler(subject.textContent, keywords, page),
+      subject.href ? findUrlSpoiler(subject.href, keywords, page) : null,
     ]),
   ].filter(Boolean);
 }
@@ -100,13 +99,14 @@ function sync() {
   readSiteTitle();
   const active = isActive();
   const aboutGta = active && isAboutGta();
+  const { nameAllowed } = rules();
   const config = active
-    ? `on:${settings.strict}:${settings.style}:${aboutGta}:${settings.keywords.join("\n")}`
+    ? `on:${settings.strict}:${settings.style}:${aboutGta}:${nameAllowed}:${settings.keywords.join("\n")}`
     : "off";
   if (config !== appliedConfig) {
     appliedConfig = config;
     blocker.clearAll();
-    blocker.configure(settings, aboutGta);
+    blocker.configure(settings, { aboutGta, nameAllowed });
     if (active) blocker.scan(document.documentElement);
   }
   const spoiler = active ? pageSpoiler() : null;
